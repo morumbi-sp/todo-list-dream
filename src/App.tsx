@@ -1,24 +1,38 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      {/* Nav Bar */}
+      <div>
+        <div>
+          <button>D/L</button>
+        </div>
+        <div>
+          <button>All</button>
+          <button>Active</button>
+          <button>Completed</button>
+        </div>
+      </div>
+
+      {/* Main */}
+      <div>
+        {['Study React', 'Work out', 'visit park', 'eat stake'].map(
+          (item, idx) => (
+            <div key={idx}>
+              <div>
+                <input type='checkbox' />
+                <span>{item}</span>
+              </div>
+              <button>Delete</button>
+            </div>
+          )
+        )}
+      </div>
+
+      {/* Footer */}
+      <form>
+        <input type='text' />
+        <button type='submit'>Add</button>
+      </form>
     </div>
   );
 }
