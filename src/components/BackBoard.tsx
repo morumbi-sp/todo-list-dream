@@ -10,7 +10,7 @@ export default function BackBoard({ children, darkMode }: Props) {
     <div
       className={`${
         darkMode && 'dark'
-      } mx-auto mt-10 min-h-[400px] max-w-sm overflow-hidden rounded-2xl `}
+      } mx-auto mt-10  max-w-sm overflow-hidden rounded-2xl `}
     >
       {children}
     </div>

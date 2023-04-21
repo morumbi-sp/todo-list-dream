@@ -16,13 +16,13 @@ export default function NavBar({ toggleDarkMode, darkMode }: Props) {
   };
 
   return (
-    <div className=' flex items-center justify-between bg-light-200 px-5 py-4 text-light-accent dark:bg-dark-200 dark:text-dark-accent'>
+    <div className=' flex items-center justify-between border-b border-gray-300 bg-light-200 px-5 py-4 text-light-accent dark:border-gray-600 dark:bg-dark-200 dark:text-dark-accent'>
       <div>
-        <button onClick={toggleDarkMode}>
+        <button className='pt-2 text-xl' onClick={toggleDarkMode}>
           {darkMode ? <MdSunny /> : <BsFillMoonFill />}
         </button>
       </div>
-      <div className='flex items-center justify-between space-x-3 font-semibold'>
+      <div className='flex items-center justify-between space-x-4 font-semibold'>
         <NavButton handleNavMenu={handleNavMenu} title='all' active={navMenu} />
         <NavButton
           handleNavMenu={handleNavMenu}
