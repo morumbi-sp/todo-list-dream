@@ -1,17 +1,17 @@
+import { useState } from 'react';
+import BackBoard from './components/BackBoard';
+import NavBar from './components/NavBar';
+
 function App() {
+  const [darkMode, setDarkMode] = useState(false);
+
+  const handleDarkMode = () => {
+    setDarkMode((prev) => !prev);
+  };
   return (
-    <div>
+    <BackBoard darkMode={darkMode}>
       {/* Nav Bar */}
-      <div>
-        <div>
-          <button>D/L</button>
-        </div>
-        <div>
-          <button>All</button>
-          <button>Active</button>
-          <button>Completed</button>
-        </div>
-      </div>
+      <NavBar toggleDarkMode={handleDarkMode} darkMode={darkMode} />
 
       {/* Main */}
       <div>
@@ -33,7 +33,7 @@ function App() {
         <input type='text' />
         <button type='submit'>Add</button>
       </form>
-    </div>
+    </BackBoard>
   );
 }
 
