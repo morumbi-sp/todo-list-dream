@@ -57,29 +57,31 @@ function App() {
   }, [todoList]);
 
   return (
-    <BackBoard darkMode={darkMode}>
-      <NavBar
-        toggleDarkMode={handleDarkMode}
-        darkMode={darkMode}
-        onNavMenu={handleNavMenu}
-        navMenu={navMenu}
-      />
-      <div className='min-h-[300px] space-y-4 bg-light-100 px-5 py-5 dark:bg-dark-100'>
-        {todoList
-          .filter((item) =>
-            navMenu === 'all' ? item : item.status === navMenu
-          )
-          .map((item) => (
-            <TodoItem
-              key={item.id}
-              item={item}
-              onDeleteTodo={handleDeleteTodo}
-              onChangeStatus={handleChangeStatus}
-            />
-          ))}
-      </div>
-      <Footer onAddTodo={handleAddTodo} />
-    </BackBoard>
+    <>
+      <BackBoard darkMode={darkMode}>
+        <NavBar
+          toggleDarkMode={handleDarkMode}
+          darkMode={darkMode}
+          onNavMenu={handleNavMenu}
+          navMenu={navMenu}
+        />
+        <div className='min-h-[300px] space-y-4 bg-light-100 px-5 py-5 dark:bg-dark-100'>
+          {todoList
+            .filter((item) =>
+              navMenu === 'all' ? item : item.status === navMenu
+            )
+            .map((item) => (
+              <TodoItem
+                key={item.id}
+                item={item}
+                onDeleteTodo={handleDeleteTodo}
+                onChangeStatus={handleChangeStatus}
+              />
+            ))}
+        </div>
+        <Footer onAddTodo={handleAddTodo} />
+      </BackBoard>
+    </>
   );
 }
 
