@@ -24,6 +24,7 @@ export default function Footer({ onAddTodo }: Props) {
           placeholder='Add Todo'
           value={todoText}
           onChange={handleChange}
+          required
         />
         <button
           className='w-28 rounded-r-lg bg-light-accent text-lg font-semibold text-dark-text dark:bg-dark-accent'
