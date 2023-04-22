@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import BackBoard from './components/BackBoard';
 import NavBar from './components/NavBar';
 import MainBoard from './components/MainBoard';
@@ -12,7 +12,9 @@ export interface ITodo {
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
-  const [todoList, setTodoList] = useState<ITodo[]>([]);
+  const [todoList, setTodoList] = useState<ITodo[]>(() =>
+    JSON.parse(localStorage.getItem('todoList') ?? '[]')
+  );
   const [navMenu, setNavMenu] = useState<'all' | 'active' | 'completed'>('all');
 
   const handleDarkMode = () => {
@@ -35,19 +37,24 @@ function App() {
 
   const handleChangeStatus = (id: string, e: React.BaseSyntheticEvent) => {
     setTodoList((prev) =>
-      prev.map((item) => {
-        if (item.id === id && e.target.checked === true) {
-          return { ...item, status: 'completed' };
-        } else if (item.id === id && e.target.checked === false) {
-          return { ...item, status: 'active' };
-        } else return item;
-      })
+      prev.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              status: e.target.checked === true ? 'completed' : ' active',
+            }
+          : item
+      )
     );
   };
 
   const handleNavMenu = (event: React.BaseSyntheticEvent) => {
     setNavMenu(event.target.name);
   };
+
+  useEffect(() => {
+    localStorage.setItem('todoList', JSON.stringify(todoList));
+  }, [todoList]);
 
   return (
     <BackBoard darkMode={darkMode}>
