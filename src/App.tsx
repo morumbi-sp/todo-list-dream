@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import BackBoard from './components/BackBoard';
 import NavBar from './components/NavBar';
 import MainBoard from './components/MainBoard';
@@ -48,8 +48,6 @@ function App() {
   const handleNavMenu = (event: React.BaseSyntheticEvent) => {
     setNavMenu(event.target.name);
   };
-
-  console.log(todoList);
 
   return (
     <BackBoard darkMode={darkMode}>

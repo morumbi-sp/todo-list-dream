@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BsFillMoonFill } from 'react-icons/bs';
 import { MdSunny } from 'react-icons/md';
 import NavButton from './NavButton';
