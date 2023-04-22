@@ -3,8 +3,8 @@ import { motion } from 'framer-motion';
 
 interface Props {
   handleNavMenu: (e: React.BaseSyntheticEvent) => void;
-  title: 'all' | 'active' | 'completed';
-  active: 'all' | 'active' | 'completed';
+  title: string;
+  active: string;
 }
 
 export default function NavButton({ handleNavMenu, title, active }: Props) {

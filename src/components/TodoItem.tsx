@@ -3,6 +3,7 @@ import { FaTrashAlt } from 'react-icons/fa';
 interface Props {
   item: string;
   id: string;
+  status: string;
   onDeleteTodo: (id: string) => void;
   onChangeStatus: (id: string, e: React.BaseSyntheticEvent) => void;
 }
@@ -12,6 +13,7 @@ export default function TodoItem({
   item,
   onDeleteTodo,
   onChangeStatus,
+  status,
 }: Props) {
   return (
     <div className='flex items-center justify-between'>
@@ -20,6 +22,7 @@ export default function TodoItem({
           type='checkbox'
           className='h-4 w-4'
           onChange={(e: React.BaseSyntheticEvent) => onChangeStatus(id, e)}
+          checked={status === 'completed'}
         />
         <span className='text-light-text dark:text-dark-text'>{item}</span>
       </div>

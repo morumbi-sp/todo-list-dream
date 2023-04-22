@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import BackBoard from './components/BackBoard';
 import NavBar from './components/NavBar';
 import MainBoard from './components/MainBoard';
@@ -13,6 +13,7 @@ export interface ITodo {
 function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [todoList, setTodoList] = useState<ITodo[]>([]);
+  const [navMenu, setNavMenu] = useState<'all' | 'active' | 'completed'>('all');
 
   const handleDarkMode = () => {
     setDarkMode((prev) => !prev);
@@ -44,15 +45,25 @@ function App() {
     );
   };
 
+  const handleNavMenu = (event: React.BaseSyntheticEvent) => {
+    setNavMenu(event.target.name);
+  };
+
   console.log(todoList);
 
   return (
     <BackBoard darkMode={darkMode}>
-      <NavBar toggleDarkMode={handleDarkMode} darkMode={darkMode} />
+      <NavBar
+        toggleDarkMode={handleDarkMode}
+        darkMode={darkMode}
+        onNavMenu={handleNavMenu}
+        navMenu={navMenu}
+      />
       <MainBoard
         todoList={todoList}
         onDeleteTodo={handleDeleteTodo}
         onChangeStatus={handleChangeStatus}
+        navMenu={navMenu}
       />
       <Footer onAddTodo={handleAddTodo} />
     </BackBoard>
