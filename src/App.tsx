@@ -11,7 +11,9 @@ export interface ITodo {
 }
 
 function App() {
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState<boolean>(() =>
+    JSON.parse(localStorage.getItem('darkMode') ?? 'false')
+  );
   const [todoList, setTodoList] = useState<ITodo[]>(() =>
     JSON.parse(localStorage.getItem('todoList') ?? '[]')
   );
@@ -20,6 +22,10 @@ function App() {
   const handleDarkMode = () => {
     setDarkMode((prev) => !prev);
   };
+
+  useEffect(() => {
+    localStorage.setItem('darkMode', JSON.stringify(darkMode));
+  }, [darkMode]);
 
   const handleAddTodo = (data: string) => {
     window.event?.preventDefault();
