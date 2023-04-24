@@ -8,6 +8,7 @@ export interface ITodo {
   id: string;
   text: string;
   status: string;
+  flag: boolean;
 }
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
       id: Date.now().toString(),
       text: data,
       status: 'active',
+      flag: false,
     };
     setTodoList((prev) => [...prev, newTodo]);
   };
@@ -48,6 +50,23 @@ function App() {
           ? {
               ...item,
               status: e.target.checked === true ? 'completed' : 'active',
+              flag: e.target.checked === true ? false : item.flag,
+            }
+          : item
+      )
+    );
+  };
+  const handleChangeFlag = (id: string, e: React.BaseSyntheticEvent) => {
+    setTodoList((prev) =>
+      prev.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              flag: !item.flag,
+              status:
+                item.status === 'completed' && item.flag === false
+                  ? 'active'
+                  : item.status,
             }
           : item
       )
@@ -72,7 +91,7 @@ function App() {
           navMenu={navMenu}
         />
         <div className='min-h-[300px] space-y-4 bg-light-100 px-5 py-5 dark:bg-dark-100'>
-          {todoList
+          {sortTodoList(todoList)
             .filter((item) =>
               navMenu === 'all' ? item : item.status === navMenu
             )
@@ -82,6 +101,7 @@ function App() {
                 item={item}
                 onDeleteTodo={handleDeleteTodo}
                 onChangeStatus={handleChangeStatus}
+                onChangeFlag={handleChangeFlag}
               />
             ))}
         </div>
@@ -92,3 +112,19 @@ function App() {
 }
 
 export default App;
+
+function sortTodoList(list: ITodo[]): ITodo[] {
+  const sortedTodoList = [...list]; // 배열 복사
+  sortedTodoList.sort((a, b) => {
+    if (a.flag === b.flag) {
+      if (a.status === b.status) {
+        return a.id.localeCompare(b.id); // id로 오름차순 정렬
+      } else {
+        return a.status.localeCompare(b.status);
+      }
+    } else {
+      return Number(b.flag) - Number(a.flag); // flag가 true인 것을 우선으로 정렬
+    }
+  });
+  return sortedTodoList;
+}
