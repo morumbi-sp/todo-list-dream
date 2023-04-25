@@ -91,7 +91,8 @@ function App() {
           navMenu={navMenu}
         />
         <div className='min-h-[300px] space-y-4 bg-light-100 px-5 py-5 dark:bg-dark-100'>
-          {sortedTodoList(todoList).flagList.length ? (
+          {sortedTodoList(todoList).flagList.length &&
+          navMenu !== 'completed' ? (
             <div className='space-y-3  border-b border-dashed border-gray-200 pb-4'>
               {sortedTodoList(todoList)
                 .flagList.filter((item) =>
