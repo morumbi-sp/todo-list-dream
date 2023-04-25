@@ -91,19 +91,39 @@ function App() {
           navMenu={navMenu}
         />
         <div className='min-h-[300px] space-y-4 bg-light-100 px-5 py-5 dark:bg-dark-100'>
-          {sortTodoList(todoList)
-            .filter((item) =>
-              navMenu === 'all' ? item : item.status === navMenu
-            )
-            .map((item) => (
-              <TodoItem
-                key={item.id}
-                item={item}
-                onDeleteTodo={handleDeleteTodo}
-                onChangeStatus={handleChangeStatus}
-                onChangeFlag={handleChangeFlag}
-              />
-            ))}
+          {sortedTodoList(todoList).flagList.length ? (
+            <div className='space-y-3  border-b border-dashed border-gray-200 pb-4'>
+              {sortedTodoList(todoList)
+                .flagList.filter((item) =>
+                  navMenu === 'all' ? item : item.status === navMenu
+                )
+                .map((item) => (
+                  <TodoItem
+                    key={item.id}
+                    item={item}
+                    onDeleteTodo={handleDeleteTodo}
+                    onChangeStatus={handleChangeStatus}
+                    onChangeFlag={handleChangeFlag}
+                  />
+                ))}
+            </div>
+          ) : null}
+
+          <div className='space-y-4'>
+            {sortedTodoList(todoList)
+              .restList.filter((item) =>
+                navMenu === 'all' ? item : item.status === navMenu
+              )
+              .map((item) => (
+                <TodoItem
+                  key={item.id}
+                  item={item}
+                  onDeleteTodo={handleDeleteTodo}
+                  onChangeStatus={handleChangeStatus}
+                  onChangeFlag={handleChangeFlag}
+                />
+              ))}
+          </div>
         </div>
         <Footer onAddTodo={handleAddTodo} />
       </BackBoard>
@@ -113,18 +133,18 @@ function App() {
 
 export default App;
 
-function sortTodoList(list: ITodo[]): ITodo[] {
-  const sortedTodoList = [...list]; // 배열 복사
-  sortedTodoList.sort((a, b) => {
-    if (a.flag === b.flag) {
-      if (a.status === b.status) {
-        return a.id.localeCompare(b.id); // id로 오름차순 정렬
-      } else {
-        return a.status.localeCompare(b.status);
-      }
-    } else {
-      return Number(b.flag) - Number(a.flag); // flag가 true인 것을 우선으로 정렬
-    }
-  });
-  return sortedTodoList;
+function sortedTodoList(list: ITodo[]): {
+  flagList: ITodo[];
+  restList: ITodo[];
+} {
+  const flagList = [...list]
+    .filter((item) => item.flag === true)
+    .sort((a, b) => a.id.localeCompare(b.id));
+  const restList = [...list]
+    .filter((item) => item.flag === false)
+    .sort((a, b) => {
+      if (a.status === b.status) return a.id.localeCompare(b.id);
+      else return a.status.localeCompare(b.status);
+    });
+  return { flagList, restList };
 }
