@@ -17,14 +17,16 @@ export default function TodoItem({
 }: Props) {
   return (
     <div className='flex items-center justify-between'>
-      <div className='flex items-center space-x-2'>
+      <div className='flex items-center space-x-2 truncate'>
         <input
           type='checkbox'
           className='h-4 w-4'
           onChange={(e: React.BaseSyntheticEvent) => onChangeStatus(item.id, e)}
           checked={item.status === 'completed'}
         />
-        <span className='text-light-text dark:text-dark-text'>{item.text}</span>
+        <span className='truncate text-light-text dark:text-dark-text'>
+          {item.text}
+        </span>
       </div>
       <div className='flex space-x-4'>
         <button
