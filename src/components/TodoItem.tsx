@@ -32,7 +32,9 @@ export default function TodoItem({
     <div
       {...draggableProps}
       ref={refData}
-      className={`flex items-center justify-between `}
+      className={`flex items-center justify-between border-b py-2 ${
+        dragMode ? 'border-gray-200' : 'border-transparent'
+      } `}
     >
       <div className='flex items-center space-x-2 truncate'>
         <input

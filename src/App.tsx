@@ -154,14 +154,14 @@ function App() {
         />
         {drag ? (
           <DragDropContext onDragEnd={onDragEnd}>
-            <div className='min-h-[300px] space-y-4 bg-light-100 px-5 py-5 dark:bg-dark-100'>
+            <div className='min-h-[300px]  bg-light-100 px-5 py-5 dark:bg-dark-100'>
               {flagTodoList && navMenu !== 'completed' && (
                 <Droppable droppableId='flag'>
                   {(magic) => (
                     <div
                       ref={magic.innerRef}
                       {...magic.droppableProps}
-                      className='space-y-3  border-b border-dashed border-gray-200 pb-4'
+                      className='  border-b border-dashed border-gray-200 pb-4'
                     >
                       {flagTodoList.map((item, idx) => (
                         <Draggable
@@ -197,7 +197,7 @@ function App() {
                     <div
                       ref={magic.innerRef}
                       {...magic.droppableProps}
-                      className='space-y-4'
+                      className=''
                     >
                       {activeTodoList.map((item, idx) => (
                         <Draggable
@@ -228,7 +228,7 @@ function App() {
               )}
 
               {completeTodoList && navMenu !== 'active' && (
-                <div className='space-y-4'>
+                <div className=''>
                   {completeTodoList.map((item) => (
                     <TodoItem
                       key={item.id}
@@ -244,9 +244,9 @@ function App() {
             </div>
           </DragDropContext>
         ) : (
-          <div className='min-h-[300px] space-y-4 bg-light-100 px-5 py-5 dark:bg-dark-100'>
+          <div className='min-h-[300px] bg-light-100 px-5 py-5 dark:bg-dark-100'>
             {flagTodoList && navMenu !== 'completed' && (
-              <div className='space-y-3  border-b border-dashed border-gray-200 pb-4'>
+              <div className='border-b border-dashed border-gray-200 pb-4'>
                 {flagTodoList.map((item) => (
                   <TodoItem
                     key={item.id}
@@ -260,7 +260,7 @@ function App() {
             )}
 
             {activeTodoList && navMenu !== 'completed' && (
-              <div className='space-y-4'>
+              <div className=''>
                 {activeTodoList.map((item) => (
                   <TodoItem
                     key={item.id}
@@ -274,7 +274,7 @@ function App() {
             )}
 
             {completeTodoList && navMenu !== 'active' && (
-              <div className='space-y-4'>
+              <div className=''>
                 {completeTodoList.map((item) => (
                   <TodoItem
                     key={item.id}
