@@ -1,5 +1,6 @@
 import { FaTrashAlt } from 'react-icons/fa';
 import { IoIosFlag } from 'react-icons/io';
+import { AiFillStar } from 'react-icons/ai';
 import { RxDragHandleHorizontal } from 'react-icons/rx';
 import { ITodo } from '../App';
 
@@ -59,7 +60,7 @@ export default function TodoItem({
           onClick={(e: React.BaseSyntheticEvent) => onChangeFlag(item.id, e)}
           onFocus={dragMode ? toggleDragMode : undefined}
         >
-          <IoIosFlag
+          <AiFillStar
             className={`text-sm  ${
               item.status === 'flag'
                 ? 'text-dark-text dark:text-light-text'
