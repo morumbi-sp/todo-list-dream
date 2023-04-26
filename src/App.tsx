@@ -3,25 +3,40 @@ import BackBoard from './components/BackBoard';
 import NavBar from './components/NavBar';
 import Footer from './components/Footer';
 import TodoItem from './components/TodoItem';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { DropResult } from 'react-beautiful-dnd';
+import { changeArrayItem } from './libs/dragNdrop';
 
 export interface ITodo {
   id: string;
   text: string;
-  status: string;
-  flag: boolean;
+  status: 'flag' | 'active' | 'complete';
 }
 
 function App() {
   const [darkMode, setDarkMode] = useState<boolean>(() =>
     JSON.parse(localStorage.getItem('darkMode') ?? 'false')
   );
-  const [todoList, setTodoList] = useState<ITodo[]>(() =>
-    JSON.parse(localStorage.getItem('todoList') ?? '[]')
+
+  const [drag, setDrag] = useState(true);
+
+  const [flagTodoList, setFlagTodoList] = useState<ITodo[]>(() =>
+    JSON.parse(localStorage.getItem('flagTodoList') ?? '[]')
   );
+  const [activeTodoList, setActiveTodoList] = useState<ITodo[]>(() =>
+    JSON.parse(localStorage.getItem('activeTodoList') ?? '[]')
+  );
+  const [completeTodoList, setCompleteTodoList] = useState<ITodo[]>(() =>
+    JSON.parse(localStorage.getItem('completeTodoList') ?? '[]')
+  );
+
   const [navMenu, setNavMenu] = useState<'all' | 'active' | 'completed'>('all');
 
   const handleDarkMode = () => {
     setDarkMode((prev) => !prev);
+  };
+  const handleDragMode = () => {
+    setDrag((prev) => !prev);
   };
 
   useEffect(() => {
@@ -30,47 +45,74 @@ function App() {
 
   const handleAddTodo = (data: string) => {
     window.event?.preventDefault();
-    const newTodo = {
+    const newTodo: ITodo = {
       id: Date.now().toString(),
       text: data,
       status: 'active',
-      flag: false,
     };
-    setTodoList((prev) => [...prev, newTodo]);
+    setActiveTodoList((prev) => [...prev, newTodo]);
   };
 
   const handleDeleteTodo = (id: string) => {
-    setTodoList((prev) => prev.filter((item) => item.id !== id));
+    setFlagTodoList((prev) => prev.filter((item) => item.id !== id));
+    setActiveTodoList((prev) => prev.filter((item) => item.id !== id));
+    setCompleteTodoList((prev) => prev.filter((item) => item.id !== id));
   };
 
   const handleChangeStatus = (id: string, e: React.BaseSyntheticEvent) => {
-    setTodoList((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              status: e.target.checked === true ? 'completed' : 'active',
-              flag: e.target.checked === true ? false : item.flag,
-            }
-          : item
-      )
-    );
+    const fromFlag = flagTodoList.find((item) => item.id === id);
+    const fromActive = activeTodoList.find((item) => item.id === id);
+    const fromComplete = completeTodoList.find((item) => item.id === id);
+
+    if (fromFlag) {
+      fromFlag.status = 'complete';
+      setCompleteTodoList((prev) => [...prev, fromFlag]);
+      setFlagTodoList((prev) => prev.filter((item) => item.id !== fromFlag.id));
+    }
+
+    if (fromActive) {
+      fromActive.status = 'complete';
+      setCompleteTodoList((prev) => [...prev, fromActive]);
+      setActiveTodoList((prev) =>
+        prev.filter((item) => item.id !== fromActive.id)
+      );
+    }
+
+    if (fromComplete) {
+      fromComplete.status = 'active';
+      setActiveTodoList((prev) => [...prev, fromComplete]);
+      setCompleteTodoList((prev) =>
+        prev.filter((item) => item.id !== fromComplete.id)
+      );
+    }
   };
+
   const handleChangeFlag = (id: string, e: React.BaseSyntheticEvent) => {
-    setTodoList((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              flag: !item.flag,
-              status:
-                item.status === 'completed' && item.flag === false
-                  ? 'active'
-                  : item.status,
-            }
-          : item
-      )
-    );
+    const fromFlag = flagTodoList.find((item) => item.id === id);
+    const fromActive = activeTodoList.find((item) => item.id === id);
+    const fromComplete = completeTodoList.find((item) => item.id === id);
+
+    if (fromFlag) {
+      fromFlag.status = 'active';
+      setActiveTodoList((prev) => [...prev, fromFlag]);
+      setFlagTodoList((prev) => prev.filter((item) => item.id !== fromFlag.id));
+    }
+
+    if (fromActive) {
+      fromActive.status = 'flag';
+      setFlagTodoList((prev) => [...prev, fromActive]);
+      setActiveTodoList((prev) =>
+        prev.filter((item) => item.id !== fromActive.id)
+      );
+    }
+
+    if (fromComplete) {
+      fromComplete.status = 'flag';
+      setFlagTodoList((prev) => [...prev, fromComplete]);
+      setCompleteTodoList((prev) =>
+        prev.filter((item) => item.id !== fromComplete.id)
+      );
+    }
   };
 
   const handleNavMenu = (event: React.BaseSyntheticEvent) => {
@@ -78,8 +120,26 @@ function App() {
   };
 
   useEffect(() => {
-    localStorage.setItem('todoList', JSON.stringify(todoList));
-  }, [todoList]);
+    localStorage.setItem('flagTodoList', JSON.stringify(flagTodoList));
+    localStorage.setItem('activeTodoList', JSON.stringify(activeTodoList));
+    localStorage.setItem('completeTodoList', JSON.stringify(completeTodoList));
+  }, [flagTodoList, activeTodoList, completeTodoList]);
+
+  const onDragEnd = (arg: DropResult) => {
+    const {
+      source: { droppableId, index: fromIdx },
+    } = arg;
+    const toIdx = arg.destination?.index;
+
+    if (droppableId === 'flag' && toIdx !== undefined) {
+      const newArray = changeArrayItem([...flagTodoList], fromIdx, toIdx);
+      setFlagTodoList((prev) => newArray);
+    }
+    if (droppableId === 'active' && toIdx !== undefined) {
+      const newArray = changeArrayItem([...activeTodoList], fromIdx, toIdx);
+      setActiveTodoList((prev) => newArray);
+    }
+  };
 
   return (
     <>
@@ -89,16 +149,105 @@ function App() {
           darkMode={darkMode}
           onNavMenu={handleNavMenu}
           navMenu={navMenu}
+          toggleDragMode={handleDragMode}
+          dragMode={drag}
         />
-        <div className='min-h-[300px] space-y-4 bg-light-100 px-5 py-5 dark:bg-dark-100'>
-          {sortedTodoList(todoList).flagList.length &&
-          navMenu !== 'completed' ? (
-            <div className='space-y-3  border-b border-dashed border-gray-200 pb-4'>
-              {sortedTodoList(todoList)
-                .flagList.filter((item) =>
-                  navMenu === 'all' ? item : item.status === navMenu
-                )
-                .map((item) => (
+        {drag ? (
+          <DragDropContext onDragEnd={onDragEnd}>
+            <div className='min-h-[300px]  bg-light-100 px-5 py-5 dark:bg-dark-100'>
+              {flagTodoList && navMenu !== 'completed' && (
+                <Droppable droppableId='flag'>
+                  {(magic) => (
+                    <div
+                      ref={magic.innerRef}
+                      {...magic.droppableProps}
+                      className='  border-b border-dashed border-gray-200 pb-4'
+                    >
+                      {flagTodoList.map((item, idx) => (
+                        <Draggable
+                          draggableId={item.id}
+                          index={idx}
+                          key={item.id}
+                        >
+                          {(magic) => (
+                            <TodoItem
+                              refData={magic.innerRef}
+                              draggableProps={magic.draggableProps}
+                              dragHandleProps={magic.dragHandleProps}
+                              item={item}
+                              onDeleteTodo={handleDeleteTodo}
+                              onChangeStatus={handleChangeStatus}
+                              onChangeFlag={handleChangeFlag}
+                              toggleDragMode={handleDragMode}
+                              dragMode={drag}
+                              drag
+                            />
+                          )}
+                        </Draggable>
+                      ))}
+                      {magic.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              )}
+
+              {activeTodoList && navMenu !== 'completed' && (
+                <Droppable droppableId='active'>
+                  {(magic) => (
+                    <div
+                      ref={magic.innerRef}
+                      {...magic.droppableProps}
+                      className=''
+                    >
+                      {activeTodoList.map((item, idx) => (
+                        <Draggable
+                          draggableId={item.id}
+                          index={idx}
+                          key={item.id}
+                        >
+                          {(magic) => (
+                            <TodoItem
+                              refData={magic.innerRef}
+                              draggableProps={magic.draggableProps}
+                              dragHandleProps={magic.dragHandleProps}
+                              item={item}
+                              onDeleteTodo={handleDeleteTodo}
+                              onChangeStatus={handleChangeStatus}
+                              onChangeFlag={handleChangeFlag}
+                              toggleDragMode={handleDragMode}
+                              dragMode={drag}
+                              drag
+                            />
+                          )}
+                        </Draggable>
+                      ))}
+                      {magic.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              )}
+
+              {completeTodoList && navMenu !== 'active' && (
+                <div className=''>
+                  {completeTodoList.map((item) => (
+                    <TodoItem
+                      key={item.id}
+                      item={item}
+                      onDeleteTodo={handleDeleteTodo}
+                      onChangeStatus={handleChangeStatus}
+                      onChangeFlag={handleChangeFlag}
+                      drag
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </DragDropContext>
+        ) : (
+          <div className='min-h-[300px] bg-light-100 px-5 py-5 dark:bg-dark-100'>
+            {flagTodoList && navMenu !== 'completed' && (
+              <div className='border-b border-dashed border-gray-200 pb-4'>
+                {flagTodoList.map((item) => (
                   <TodoItem
                     key={item.id}
                     item={item}
@@ -107,45 +256,47 @@ function App() {
                     onChangeFlag={handleChangeFlag}
                   />
                 ))}
-            </div>
-          ) : null}
+              </div>
+            )}
 
-          <div className='space-y-4'>
-            {sortedTodoList(todoList)
-              .restList.filter((item) =>
-                navMenu === 'all' ? item : item.status === navMenu
-              )
-              .map((item) => (
-                <TodoItem
-                  key={item.id}
-                  item={item}
-                  onDeleteTodo={handleDeleteTodo}
-                  onChangeStatus={handleChangeStatus}
-                  onChangeFlag={handleChangeFlag}
-                />
-              ))}
+            {activeTodoList && navMenu !== 'completed' && (
+              <div className=''>
+                {activeTodoList.map((item) => (
+                  <TodoItem
+                    key={item.id}
+                    item={item}
+                    onDeleteTodo={handleDeleteTodo}
+                    onChangeStatus={handleChangeStatus}
+                    onChangeFlag={handleChangeFlag}
+                  />
+                ))}
+              </div>
+            )}
+
+            {completeTodoList && navMenu !== 'active' && (
+              <div className=''>
+                {completeTodoList.map((item) => (
+                  <TodoItem
+                    key={item.id}
+                    item={item}
+                    onDeleteTodo={handleDeleteTodo}
+                    onChangeStatus={handleChangeStatus}
+                    onChangeFlag={handleChangeFlag}
+                  />
+                ))}
+              </div>
+            )}
           </div>
-        </div>
-        <Footer onAddTodo={handleAddTodo} />
+        )}
+
+        <Footer
+          onAddTodo={handleAddTodo}
+          toggleDragMode={handleDragMode}
+          dragMode={drag}
+        />
       </BackBoard>
     </>
   );
 }
 
 export default App;
-
-function sortedTodoList(list: ITodo[]): {
-  flagList: ITodo[];
-  restList: ITodo[];
-} {
-  const flagList = [...list]
-    .filter((item) => item.flag === true)
-    .sort((a, b) => a.id.localeCompare(b.id));
-  const restList = [...list]
-    .filter((item) => item.flag === false)
-    .sort((a, b) => {
-      if (a.status === b.status) return a.id.localeCompare(b.id);
-      else return a.status.localeCompare(b.status);
-    });
-  return { flagList, restList };
-}

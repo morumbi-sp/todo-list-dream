@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 
 interface Props {
   onAddTodo: (data: string) => void;
+  toggleDragMode: () => void;
+  dragMode: boolean;
 }
 
-export default function Footer({ onAddTodo }: Props) {
+export default function Footer({ onAddTodo, toggleDragMode, dragMode }: Props) {
   const [todoText, setTodoText] = useState('');
   const handleChange = (event: React.BaseSyntheticEvent) => {
     setTodoText(event.target.value);
@@ -25,6 +27,7 @@ export default function Footer({ onAddTodo }: Props) {
           value={todoText}
           onChange={handleChange}
           required
+          onFocus={dragMode ? toggleDragMode : undefined}
         />
         <button
           className='w-28 rounded-r-lg bg-light-accent text-lg font-semibold text-dark-text dark:bg-dark-accent'
