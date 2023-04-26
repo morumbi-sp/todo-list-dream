@@ -8,16 +8,12 @@ export interface ITodo {
   id: string;
   text: string;
   status: string;
-  flag: boolean;
 }
 
 function App() {
   const [darkMode, setDarkMode] = useState<boolean>(() =>
     JSON.parse(localStorage.getItem('darkMode') ?? 'false')
   );
-  // const [todoList, setTodoList] = useState<ITodo[]>(() =>
-  //   JSON.parse(localStorage.getItem('todoList') ?? '[]')
-  // );
 
   const [flagTodoList, setFlagTodoList] = useState<ITodo[]>(() =>
     JSON.parse(localStorage.getItem('flagTodoList') ?? '[]')
@@ -45,10 +41,9 @@ function App() {
       id: Date.now().toString(),
       text: data,
       status: 'active',
-      flag: false,
     };
-
     setActiveTodoList((prev) => [...prev, newTodo]);
+    console.log(activeTodoList);
   };
 
   const handleDeleteTodo = (id: string) => {
@@ -58,61 +53,59 @@ function App() {
   };
 
   const handleChangeStatus = (id: string, e: React.BaseSyntheticEvent) => {
-    const toComplete = activeTodoList.find((item) => item.id === id);
-    const toActive = completeTodoList.find((item) => item.id === id);
+    const fromFlag = flagTodoList.find((item) => item.id === id);
+    const fromActive = activeTodoList.find((item) => item.id === id);
+    const fromComplete = completeTodoList.find((item) => item.id === id);
 
-    if (toComplete) {
-      toComplete.status = 'complete';
-      setCompleteTodoList((prev) => [...prev, toComplete]);
+    if (fromFlag) {
+      fromFlag.status = 'complete';
+      setCompleteTodoList((prev) => [...prev, fromFlag]);
+      setFlagTodoList((prev) => prev.filter((item) => item.id !== fromFlag.id));
+    }
+
+    if (fromActive) {
+      fromActive.status = 'complete';
+      setCompleteTodoList((prev) => [...prev, fromActive]);
       setActiveTodoList((prev) =>
-        prev.filter((item) => item.id !== toComplete.id)
+        prev.filter((item) => item.id !== fromActive.id)
       );
     }
 
-    if (toActive) {
-      toActive.status = 'active';
-      setActiveTodoList((prev) => [...prev, toActive]);
+    if (fromComplete) {
+      fromComplete.status = 'active';
+      setActiveTodoList((prev) => [...prev, fromComplete]);
       setCompleteTodoList((prev) =>
-        prev.filter((item) => item.id !== toActive.id)
+        prev.filter((item) => item.id !== fromComplete.id)
       );
     }
   };
 
   const handleChangeFlag = (id: string, e: React.BaseSyntheticEvent) => {
-    setFlagTodoList((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              flag: !item.flag,
-            }
-          : item
-      )
-    );
-    setActiveTodoList((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              flag: !item.flag,
-            }
-          : item
-      )
-    );
-    setCompleteTodoList((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              flag: !item.flag,
-              status:
-                item.status === 'completed' && item.flag === false
-                  ? 'active'
-                  : item.status,
-            }
-          : item
-      )
-    );
+    const fromFlag = flagTodoList.find((item) => item.id === id);
+    const fromActive = activeTodoList.find((item) => item.id === id);
+    const fromComplete = completeTodoList.find((item) => item.id === id);
+
+    if (fromFlag) {
+      fromFlag.status = 'active';
+      setActiveTodoList((prev) => [...prev, fromFlag]);
+      setFlagTodoList((prev) => prev.filter((item) => item.id !== fromFlag.id));
+    }
+
+    if (fromActive) {
+      fromActive.status = 'flag';
+      setFlagTodoList((prev) => [...prev, fromActive]);
+      setActiveTodoList((prev) =>
+        prev.filter((item) => item.id !== fromActive.id)
+      );
+    }
+
+    if (fromComplete) {
+      fromComplete.status = 'flag';
+      setFlagTodoList((prev) => [...prev, fromComplete]);
+      setCompleteTodoList((prev) =>
+        prev.filter((item) => item.id !== fromComplete.id)
+      );
+    }
   };
 
   const handleNavMenu = (event: React.BaseSyntheticEvent) => {
@@ -191,21 +184,3 @@ function App() {
 }
 
 export default App;
-
-// function sortedTodoList(list: ITodo[]): {
-//   flagList: ITodo[];
-//   restList: ITodo[];
-// } {
-//   const flagList = [...list].filter((item) => item.flag === true);
-//   // .sort((a, b) => b.id.localeCompare(a.id));
-//   const restList = [...list]
-//     .filter((item) => item.flag === false)
-//     .sort((a, b) => {
-//       if (a.status === b.status) return b.id.localeCompare(a.id);
-//       else return a.status.localeCompare(b.status);
-//     });
-//   const activeList = [...list].filter(
-//     (item) => item.flag === false && item.status === 'active'
-//   );
-//   return { flagList, restList };
-// }

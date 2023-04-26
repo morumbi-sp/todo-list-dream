@@ -31,7 +31,7 @@ export default function TodoItem({
       <div className='flex space-x-4'>
         <button
           className={`flex aspect-square h-6 items-center justify-center rounded-full ${
-            item.flag
+            item.status === 'flag'
               ? 'bg-red-500 dark:bg-orange-600'
               : 'bg-gray-300 dark:bg-gray-600'
           }`}
@@ -39,7 +39,7 @@ export default function TodoItem({
         >
           <IoIosFlag
             className={`text-sm  ${
-              item.flag
+              item.status === 'flag'
                 ? 'text-dark-text dark:text-light-text'
                 : 'text-light-text dark:text-dark-text'
             }`}
