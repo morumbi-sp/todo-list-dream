@@ -1,18 +1,23 @@
 import React from 'react';
 import { BsFillMoonFill } from 'react-icons/bs';
 import { MdSunny } from 'react-icons/md';
+import { RiDragMove2Fill } from 'react-icons/ri';
 import NavButton from './NavButton';
 
 interface Props {
   toggleDarkMode: () => void;
+  toggleDragMode: () => void;
   darkMode: boolean;
+  dragMode: boolean;
   onNavMenu: (event: React.BaseSyntheticEvent) => void;
   navMenu: string;
 }
 
 export default function NavBar({
   toggleDarkMode,
+  toggleDragMode,
   darkMode,
+  dragMode,
   onNavMenu,
   navMenu,
 }: Props) {
@@ -24,24 +29,44 @@ export default function NavBar({
         </div>
       </div>
       <div className=' flex items-center justify-between px-5 pt-3'>
-        <div>
+        {/* <div>
           <button className='pt-2 text-xl' onClick={toggleDarkMode}>
             {darkMode ? <MdSunny /> : <BsFillMoonFill />}
           </button>
-        </div>
+        </div> */}
+
         <div className='flex items-center justify-between space-x-4 font-semibold'>
-          <NavButton handleNavMenu={onNavMenu} title='all' active={navMenu} />
-          <NavButton
-            handleNavMenu={onNavMenu}
-            title='active'
-            active={navMenu}
-          />
-          <NavButton
-            handleNavMenu={onNavMenu}
-            title='completed'
-            active={navMenu}
-          />
+          {dragMode ? (
+            <span className=' text-lg font-normal'> Move your todo</span>
+          ) : (
+            <>
+              <NavButton
+                handleNavMenu={onNavMenu}
+                title='all'
+                active={navMenu}
+              />
+              <NavButton
+                handleNavMenu={onNavMenu}
+                title='active'
+                active={navMenu}
+              />
+              <NavButton
+                handleNavMenu={onNavMenu}
+                title='completed'
+                active={navMenu}
+              />
+            </>
+          )}
         </div>
+
+        <button
+          className={`mt-1 flex aspect-square h-[24px] items-center justify-center rounded-full text-lg text-white ${
+            dragMode ? 'bg-light-accent' : 'e bg-gray-400'
+          }`}
+          onClick={toggleDragMode}
+        >
+          <RiDragMove2Fill />
+        </button>
       </div>
     </div>
   );

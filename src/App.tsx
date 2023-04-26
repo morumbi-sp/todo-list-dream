@@ -5,6 +5,7 @@ import Footer from './components/Footer';
 import TodoItem from './components/TodoItem';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { DropResult } from 'react-beautiful-dnd';
+import { changeArrayItem } from './libs/dragNdrop';
 
 export interface ITodo {
   id: string;
@@ -34,6 +35,9 @@ function App() {
   const handleDarkMode = () => {
     setDarkMode((prev) => !prev);
   };
+  const handleDragMode = () => {
+    setDrag((prev) => !prev);
+  };
 
   useEffect(() => {
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
@@ -47,7 +51,6 @@ function App() {
       status: 'active',
     };
     setActiveTodoList((prev) => [...prev, newTodo]);
-    console.log(activeTodoList);
   };
 
   const handleDeleteTodo = (id: string) => {
@@ -128,9 +131,13 @@ function App() {
     } = arg;
     const toIdx = arg.destination?.index;
 
-    if (droppableId === 'flag' && toIdx) {
+    if (droppableId === 'flag' && toIdx !== undefined) {
       const newArray = changeArrayItem([...flagTodoList], fromIdx, toIdx);
       setFlagTodoList((prev) => newArray);
+    }
+    if (droppableId === 'active' && toIdx !== undefined) {
+      const newArray = changeArrayItem([...activeTodoList], fromIdx, toIdx);
+      setActiveTodoList((prev) => newArray);
     }
   };
 
@@ -142,6 +149,8 @@ function App() {
           darkMode={darkMode}
           onNavMenu={handleNavMenu}
           navMenu={navMenu}
+          toggleDragMode={handleDragMode}
+          dragMode={drag}
         />
         {drag ? (
           <DragDropContext onDragEnd={onDragEnd}>
@@ -169,6 +178,8 @@ function App() {
                               onDeleteTodo={handleDeleteTodo}
                               onChangeStatus={handleChangeStatus}
                               onChangeFlag={handleChangeFlag}
+                              toggleDragMode={handleDragMode}
+                              dragMode={drag}
                               drag
                             />
                           )}
@@ -181,18 +192,39 @@ function App() {
               )}
 
               {activeTodoList && navMenu !== 'completed' && (
-                <div className='space-y-4'>
-                  {activeTodoList.map((item) => (
-                    <TodoItem
-                      key={item.id}
-                      item={item}
-                      onDeleteTodo={handleDeleteTodo}
-                      onChangeStatus={handleChangeStatus}
-                      onChangeFlag={handleChangeFlag}
-                      drag
-                    />
-                  ))}
-                </div>
+                <Droppable droppableId='active'>
+                  {(magic) => (
+                    <div
+                      ref={magic.innerRef}
+                      {...magic.droppableProps}
+                      className='space-y-4'
+                    >
+                      {activeTodoList.map((item, idx) => (
+                        <Draggable
+                          draggableId={item.id}
+                          index={idx}
+                          key={item.id}
+                        >
+                          {(magic) => (
+                            <TodoItem
+                              refData={magic.innerRef}
+                              draggableProps={magic.draggableProps}
+                              dragHandleProps={magic.dragHandleProps}
+                              item={item}
+                              onDeleteTodo={handleDeleteTodo}
+                              onChangeStatus={handleChangeStatus}
+                              onChangeFlag={handleChangeFlag}
+                              toggleDragMode={handleDragMode}
+                              dragMode={drag}
+                              drag
+                            />
+                          )}
+                        </Draggable>
+                      ))}
+                      {magic.placeholder}
+                    </div>
+                  )}
+                </Droppable>
               )}
 
               {completeTodoList && navMenu !== 'active' && (
@@ -257,44 +289,14 @@ function App() {
           </div>
         )}
 
-        <Footer onAddTodo={handleAddTodo} />
+        <Footer
+          onAddTodo={handleAddTodo}
+          toggleDragMode={handleDragMode}
+          dragMode={drag}
+        />
       </BackBoard>
     </>
   );
 }
 
 export default App;
-
-function changeArrayItem(
-  arr: ITodo[],
-  draggedItem: number,
-  targetIndex: number
-): ITodo[] {
-  // 배열의 길이가 1 이하인 경우는 정렬할 필요가 없습니다.
-  if (arr.length <= 1) {
-    return arr;
-  }
-
-  // 선택한 값을 제외한 나머지 요소들만을 대상으로 정렬합니다.
-  for (let i = 0; i < arr.length - 1; i++) {
-    for (let j = 0; j < arr.length - i - 1; j++) {
-      // 선택한 값을 비교하지 않도록 건너뜁니다.
-      if (j === draggedItem || j + 1 === draggedItem) {
-        continue;
-      }
-
-      if (arr[j] > arr[j + 1]) {
-        // 두 요소의 위치를 교환합니다.
-        const temp = arr[j];
-        arr[j] = arr[j + 1];
-        arr[j + 1] = temp;
-      }
-    }
-  }
-
-  // 선택한 값을 지정된 위치로 이동시킵니다.
-  const excludedValue = arr.splice(draggedItem, 1)[0];
-  arr.splice(targetIndex, 0, excludedValue);
-
-  return arr;
-}
