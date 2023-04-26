@@ -22,7 +22,7 @@ export default function TodoItem({
           type='checkbox'
           className='h-4 w-4'
           onChange={(e: React.BaseSyntheticEvent) => onChangeStatus(item.id, e)}
-          checked={item.status === 'completed'}
+          checked={item.status === 'complete'}
         />
         <span className='truncate text-light-text dark:text-dark-text'>
           {item.text}

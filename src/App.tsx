@@ -15,9 +15,20 @@ function App() {
   const [darkMode, setDarkMode] = useState<boolean>(() =>
     JSON.parse(localStorage.getItem('darkMode') ?? 'false')
   );
-  const [todoList, setTodoList] = useState<ITodo[]>(() =>
-    JSON.parse(localStorage.getItem('todoList') ?? '[]')
+  // const [todoList, setTodoList] = useState<ITodo[]>(() =>
+  //   JSON.parse(localStorage.getItem('todoList') ?? '[]')
+  // );
+
+  const [flagTodoList, setFlagTodoList] = useState<ITodo[]>(() =>
+    JSON.parse(localStorage.getItem('flagTodoList') ?? '[]')
   );
+  const [activeTodoList, setActiveTodoList] = useState<ITodo[]>(() =>
+    JSON.parse(localStorage.getItem('activeTodoList') ?? '[]')
+  );
+  const [completeTodoList, setCompleteTodoList] = useState<ITodo[]>(() =>
+    JSON.parse(localStorage.getItem('completeTodoList') ?? '[]')
+  );
+
   const [navMenu, setNavMenu] = useState<'all' | 'active' | 'completed'>('all');
 
   const handleDarkMode = () => {
@@ -36,28 +47,59 @@ function App() {
       status: 'active',
       flag: false,
     };
-    setTodoList((prev) => [...prev, newTodo]);
+
+    setActiveTodoList((prev) => [...prev, newTodo]);
   };
 
   const handleDeleteTodo = (id: string) => {
-    setTodoList((prev) => prev.filter((item) => item.id !== id));
+    setFlagTodoList((prev) => prev.filter((item) => item.id !== id));
+    setActiveTodoList((prev) => prev.filter((item) => item.id !== id));
+    setCompleteTodoList((prev) => prev.filter((item) => item.id !== id));
   };
 
   const handleChangeStatus = (id: string, e: React.BaseSyntheticEvent) => {
-    setTodoList((prev) =>
+    const toComplete = activeTodoList.find((item) => item.id === id);
+    const toActive = completeTodoList.find((item) => item.id === id);
+
+    if (toComplete) {
+      toComplete.status = 'complete';
+      setCompleteTodoList((prev) => [...prev, toComplete]);
+      setActiveTodoList((prev) =>
+        prev.filter((item) => item.id !== toComplete.id)
+      );
+    }
+
+    if (toActive) {
+      toActive.status = 'active';
+      setActiveTodoList((prev) => [...prev, toActive]);
+      setCompleteTodoList((prev) =>
+        prev.filter((item) => item.id !== toActive.id)
+      );
+    }
+  };
+
+  const handleChangeFlag = (id: string, e: React.BaseSyntheticEvent) => {
+    setFlagTodoList((prev) =>
       prev.map((item) =>
         item.id === id
           ? {
               ...item,
-              status: e.target.checked === true ? 'completed' : 'active',
-              flag: e.target.checked === true ? false : item.flag,
+              flag: !item.flag,
             }
           : item
       )
     );
-  };
-  const handleChangeFlag = (id: string, e: React.BaseSyntheticEvent) => {
-    setTodoList((prev) =>
+    setActiveTodoList((prev) =>
+      prev.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              flag: !item.flag,
+            }
+          : item
+      )
+    );
+    setCompleteTodoList((prev) =>
       prev.map((item) =>
         item.id === id
           ? {
@@ -78,8 +120,10 @@ function App() {
   };
 
   useEffect(() => {
-    localStorage.setItem('todoList', JSON.stringify(todoList));
-  }, [todoList]);
+    localStorage.setItem('flagTodoList', JSON.stringify(flagTodoList));
+    localStorage.setItem('activeTodoList', JSON.stringify(activeTodoList));
+    localStorage.setItem('completeTodoList', JSON.stringify(completeTodoList));
+  }, [flagTodoList, activeTodoList, completeTodoList]);
 
   return (
     <>
@@ -91,11 +135,10 @@ function App() {
           navMenu={navMenu}
         />
         <div className='min-h-[300px] space-y-4 bg-light-100 px-5 py-5 dark:bg-dark-100'>
-          {sortedTodoList(todoList).flagList.length &&
-          navMenu !== 'completed' ? (
+          {flagTodoList.length && navMenu !== 'completed' ? (
             <div className='space-y-3  border-b border-dashed border-gray-200 pb-4'>
-              {sortedTodoList(todoList)
-                .flagList.filter((item) =>
+              {flagTodoList
+                .filter((item) =>
                   navMenu === 'all' ? item : item.status === navMenu
                 )
                 .map((item) => (
@@ -111,8 +154,23 @@ function App() {
           ) : null}
 
           <div className='space-y-4'>
-            {sortedTodoList(todoList)
-              .restList.filter((item) =>
+            {activeTodoList
+              .filter((item) =>
+                navMenu === 'all' ? item : item.status === navMenu
+              )
+              .map((item) => (
+                <TodoItem
+                  key={item.id}
+                  item={item}
+                  onDeleteTodo={handleDeleteTodo}
+                  onChangeStatus={handleChangeStatus}
+                  onChangeFlag={handleChangeFlag}
+                />
+              ))}
+          </div>
+          <div className='space-y-4'>
+            {completeTodoList
+              .filter((item) =>
                 navMenu === 'all' ? item : item.status === navMenu
               )
               .map((item) => (
@@ -134,18 +192,20 @@ function App() {
 
 export default App;
 
-function sortedTodoList(list: ITodo[]): {
-  flagList: ITodo[];
-  restList: ITodo[];
-} {
-  const flagList = [...list]
-    .filter((item) => item.flag === true)
-    .sort((a, b) => a.id.localeCompare(b.id));
-  const restList = [...list]
-    .filter((item) => item.flag === false)
-    .sort((a, b) => {
-      if (a.status === b.status) return a.id.localeCompare(b.id);
-      else return a.status.localeCompare(b.status);
-    });
-  return { flagList, restList };
-}
+// function sortedTodoList(list: ITodo[]): {
+//   flagList: ITodo[];
+//   restList: ITodo[];
+// } {
+//   const flagList = [...list].filter((item) => item.flag === true);
+//   // .sort((a, b) => b.id.localeCompare(a.id));
+//   const restList = [...list]
+//     .filter((item) => item.flag === false)
+//     .sort((a, b) => {
+//       if (a.status === b.status) return b.id.localeCompare(a.id);
+//       else return a.status.localeCompare(b.status);
+//     });
+//   const activeList = [...list].filter(
+//     (item) => item.flag === false && item.status === 'active'
+//   );
+//   return { flagList, restList };
+// }
