@@ -7,7 +7,7 @@ import TodoItem from './components/TodoItem';
 export interface ITodo {
   id: string;
   text: string;
-  status: string;
+  status: 'flag' | 'active' | 'complete';
 }
 
 function App() {
@@ -37,7 +37,7 @@ function App() {
 
   const handleAddTodo = (data: string) => {
     window.event?.preventDefault();
-    const newTodo = {
+    const newTodo: ITodo = {
       id: Date.now().toString(),
       text: data,
       status: 'active',
@@ -118,6 +118,8 @@ function App() {
     localStorage.setItem('completeTodoList', JSON.stringify(completeTodoList));
   }, [flagTodoList, activeTodoList, completeTodoList]);
 
+  console.log(navMenu);
+
   return (
     <>
       <BackBoard darkMode={darkMode}>
@@ -128,30 +130,23 @@ function App() {
           navMenu={navMenu}
         />
         <div className='min-h-[300px] space-y-4 bg-light-100 px-5 py-5 dark:bg-dark-100'>
-          {flagTodoList.length && navMenu !== 'completed' ? (
+          {flagTodoList && navMenu !== 'completed' && (
             <div className='space-y-3  border-b border-dashed border-gray-200 pb-4'>
-              {flagTodoList
-                .filter((item) =>
-                  navMenu === 'all' ? item : item.status === navMenu
-                )
-                .map((item) => (
-                  <TodoItem
-                    key={item.id}
-                    item={item}
-                    onDeleteTodo={handleDeleteTodo}
-                    onChangeStatus={handleChangeStatus}
-                    onChangeFlag={handleChangeFlag}
-                  />
-                ))}
+              {flagTodoList.map((item) => (
+                <TodoItem
+                  key={item.id}
+                  item={item}
+                  onDeleteTodo={handleDeleteTodo}
+                  onChangeStatus={handleChangeStatus}
+                  onChangeFlag={handleChangeFlag}
+                />
+              ))}
             </div>
-          ) : null}
+          )}
 
-          <div className='space-y-4'>
-            {activeTodoList
-              .filter((item) =>
-                navMenu === 'all' ? item : item.status === navMenu
-              )
-              .map((item) => (
+          {activeTodoList && navMenu !== 'completed' && (
+            <div className='space-y-4'>
+              {activeTodoList.map((item) => (
                 <TodoItem
                   key={item.id}
                   item={item}
@@ -160,13 +155,12 @@ function App() {
                   onChangeFlag={handleChangeFlag}
                 />
               ))}
-          </div>
-          <div className='space-y-4'>
-            {completeTodoList
-              .filter((item) =>
-                navMenu === 'all' ? item : item.status === navMenu
-              )
-              .map((item) => (
+            </div>
+          )}
+
+          {completeTodoList && navMenu === 'completed' && (
+            <div className='space-y-4'>
+              {completeTodoList.map((item) => (
                 <TodoItem
                   key={item.id}
                   item={item}
@@ -175,7 +169,8 @@ function App() {
                   onChangeFlag={handleChangeFlag}
                 />
               ))}
-          </div>
+            </div>
+          )}
         </div>
         <Footer onAddTodo={handleAddTodo} />
       </BackBoard>
