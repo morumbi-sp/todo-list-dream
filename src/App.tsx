@@ -18,7 +18,7 @@ function App() {
     JSON.parse(localStorage.getItem('darkMode') ?? 'false')
   );
 
-  const [drag, setDrag] = useState(true);
+  const [drag, setDrag] = useState(false);
 
   const [flagTodoList, setFlagTodoList] = useState<ITodo[]>(() =>
     JSON.parse(localStorage.getItem('flagTodoList') ?? '[]')
@@ -155,13 +155,13 @@ function App() {
         {drag ? (
           <DragDropContext onDragEnd={onDragEnd}>
             <div className='min-h-[300px]  bg-light-100 px-5 py-5 dark:bg-dark-100'>
-              {flagTodoList && navMenu !== 'completed' && (
+              {flagTodoList.length > 0 && navMenu !== 'completed' && (
                 <Droppable droppableId='flag'>
                   {(magic) => (
                     <div
                       ref={magic.innerRef}
                       {...magic.droppableProps}
-                      className='  border-b border-dashed border-gray-200 pb-4'
+                      className='  border-b border-dashed border-gray-200 pb-2'
                     >
                       {flagTodoList.map((item, idx) => (
                         <Draggable
@@ -197,7 +197,7 @@ function App() {
                     <div
                       ref={magic.innerRef}
                       {...magic.droppableProps}
-                      className=''
+                      className='pt-1'
                     >
                       {activeTodoList.map((item, idx) => (
                         <Draggable
@@ -245,8 +245,8 @@ function App() {
           </DragDropContext>
         ) : (
           <div className='min-h-[300px] bg-light-100 px-5 py-5 dark:bg-dark-100'>
-            {flagTodoList && navMenu !== 'completed' && (
-              <div className='border-b border-dashed border-gray-200 pb-4'>
+            {flagTodoList.length > 0 && navMenu !== 'completed' && (
+              <div className='border-b border-dashed border-gray-200 pb-2'>
                 {flagTodoList.map((item) => (
                   <TodoItem
                     key={item.id}
@@ -260,7 +260,7 @@ function App() {
             )}
 
             {activeTodoList && navMenu !== 'completed' && (
-              <div className=''>
+              <div className='pt-1'>
                 {activeTodoList.map((item) => (
                   <TodoItem
                     key={item.id}
