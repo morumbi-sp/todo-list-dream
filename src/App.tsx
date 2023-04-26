@@ -158,7 +158,7 @@ function App() {
             </div>
           )}
 
-          {completeTodoList && navMenu === 'completed' && (
+          {completeTodoList && navMenu !== 'active' && (
             <div className='space-y-4'>
               {completeTodoList.map((item) => (
                 <TodoItem
